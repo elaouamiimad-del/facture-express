@@ -1,20 +1,8 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facture Pro</title>
-    <!-- Bibliothèque pour générer le PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; }
-        body { font-family: sans-serif; background: var(--bg); padding: 10px; }
-        .card { background: white; padding: 20px; border-radius: 16px; max-width: 500px; margin: auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
+        button { widt: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
         .btn-main { background: var(--primary); }
         .btn-pdf { background: #059669; }
-        #invoice-preview { display: none; padding: 20px; border: 1px solid #eee; }
+        #invoice-prevew { display: none; padding: 20px; border: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -54,16 +42,3 @@
         document.getElementById('p-sender').innerText = sender;
         document.getElementById('p-client').innerText = client;
         document.getElementById('p-desc').innerText = desc;
-        document.getElementById('p-total').innerText = "Total: " + amount + " €";
-        document.getElementById('p-date').innerText = new Date().toLocaleDateString();
-        document.getElementById('p-num').innerText = Math.floor(Math.random() * 9999);
-
-        document.getElementById('form-section').style.display = 'none';
-        document.getElementById('invoice-preview').style.display = 'block';
-    }
-    
-    // Auto-remplissage au chargement
-    window.onload = () => { document.getElementById('sender').value = localStorage.getItem('sender') || ''; }
-</script>
-</body>
-</html>
