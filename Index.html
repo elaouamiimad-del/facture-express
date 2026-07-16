@@ -1,0 +1,176 @@
+<style>
+  #app-container {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 15px;
+    border-radius: 12px;
+    max-width: 400px;
+    margin: 10px auto;
+    box-sizing: border-box;
+  }
+  h2 { color: #38bdf8; text-align: center; margin-top: 0; font-size: 1.4rem; }
+  .field { margin-bottom: 12px; }
+  label { display: block; margin-bottom: 4px; font-size: 0.85rem; color: #94a3b8; text-align: left; }
+  input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    background-color: #1e293b;
+    color: #fff;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+  }
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: #38bdf8;
+    color: #0f172a;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  #invoice-preview {
+    background-color: #ffffff;
+    color: #000000;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    display: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    text-align: left;
+  }
+  .invoice-header { 
+    display: flex; 
+    justify-content: space-between; 
+    border-bottom: 2px solid #0f172a; 
+    padding-bottom: 8px; 
+    margin-bottom: 12px; 
+  }
+  .invoice-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; }
+  .invoice-details { margin-bottom: 12px; font-size: 0.85rem; color: #334155; }
+  .invoice-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.85rem; }
+  .invoice-table th, .invoice-table td { border: 1px solid #cbd5e1; padding: 6px; text-align: left; }
+  .invoice-table th { background-color: #f1f5f9; }
+  .total-row { font-weight: bold; text-align: right; margin-top: 12px; font-size: 1rem; color: #0f172a; }
+  .btn-secondary {
+    width: 100%;
+    padding: 10px;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-top: 15px;
+    cursor: pointer;
+  }
+  .btn-back {
+    width: 100%;
+    padding: 8px;
+    background-color: #64748b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    margin-top: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+</style>
+
+<div id="app-container">
+  <h2>Facture Express ⚡</h2>
+  
+  <div id="form-section">
+    <div class="field">
+      <label>Votre Nom / Exploitation</label>
+      <input type="text" id="sender" placeholder="Ex: Les Vergers de Lucciana" value="Les Vergers de Lucciana">
+    </div>
+    <div class="field">
+      <label>Nom du Client</label>
+      <input type="text" id="client" placeholder="Ex: Epicerie Fine Bastia">
+    </div>
+    <div class="field">
+      <label>Produit / Service vendu</label>
+      <input type="text" id="product" placeholder="Ex: 20 kg de Clémentines IGP">
+    </div>
+    <div class="field">
+      <label>Montant Total (€)</label>
+      <input type="number" id="price" placeholder="Ex: 120">
+    </div>
+    <button class="btn-primary" onclick="genererFacture()">Créer la Facture</button>
+  </div>
+
+  <div id="invoice-preview">
+    <div class="invoice-header">
+      <div>
+        <div class="invoice-title" id="pdf-sender">Nom Vendeur</div>
+        <div style="font-size: 0.75rem; color: #475569;">Facture N° <span id="pdf-num"></span></div>
+      </div>
+      <div style="text-align: right; font-size: 0.75rem; color: #475569;" id="pdf-date">Date</div>
+    </div>
+    
+    <div class="invoice-details">
+      <strong>Client :</strong> <span id="pdf-client">Nom Client</span>
+    </div>
+    
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th style="text-align: right; width: 80px;">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="pdf-product">Produit</td>
+          <td style="text-align: right; font-weight: bold;" id="pdf-price">0.00 €</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="total-row">
+      Net à payer : <span id="pdf-total">0.00 €</span>
+    </div>
+    
+    <button class="btn-secondary" onclick="window.print()">Imprimer / Sauvegarder PDF</button>
+    <button class="btn-back" onclick="retourFormulaire()">Modifier</button>
+  </div>
+</div>
+
+<script>
+  function genererFacture() {
+    const sender = document.getElementById('sender').value;
+    const client = document.getElementById('client').value;
+    const product = document.getElementById('product').value;
+    const price = document.getElementById('price').value;
+
+    if (!sender || !client || !product || !price) {
+      alert('Remplis tous les champs !');
+      return;
+    }
+
+    document.getElementById('pdf-sender').innerText = sender;
+    document.getElementById('pdf-client').innerText = client;
+    document.getElementById('pdf-product').innerText = product;
+    document.getElementById('pdf-price').innerText = parseFloat(price).toFixed(2) + ' €';
+    document.getElementById('pdf-total').innerText = parseFloat(price).toFixed(2) + ' €';
+    
+    const date = new Date().toLocaleDateString('fr-FR');
+    document.getElementById('pdf-date').innerText = date;
+    
+    const numFacture = Math.floor(Math.random() * 9000) + 1000;
+    document.getElementById('pdf-num').innerText = numFacture;
+
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('invoice-preview').style.display = 'block';
+  }
+
+  function retourFormulaire() {
+    document.getElementById('form-section').style.display = 'block';
+    document.getElementById('invoice-preview').style.display = 'none';
+  }
+</script>
