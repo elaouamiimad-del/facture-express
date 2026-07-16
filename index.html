@@ -1,44 +1,62 @@
-: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
-        button { widt: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
-        .btn-main { background: var(--primary); }
-        .btn-pdf { background: #059669; }
-        #invoice-prevew { display: none; padding: 20px; border: 1px solid #eee; }
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture Pro</title>
+    <style>
+        body { font-family: sans-serif; background: #f8fafc; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #0f172a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        @media print {
+            body * { visibility: hidden; }
+            #pdf-content, #pdf-content * { visibility: visible; }
+            #pdf-content { position: absolute; left: 0; top: 0; width: 100%; }
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div id="form-section">
-        <h2 style="text-align:center;">Nouvelle Facture</h2>
-        <input type="text" id="sender" placeholder="Nom de votre entreprise">
-        <input type="text" id="client" placeholder="Nom du client">
-        <input type="text" id="desc" placeholder="Description du service">
-        <input type="number" id="amount" placeholder="Montant TTC (€)">
-        <button class="btn-main" onclick="generer()">Créer la facture</button>
-    </div>
+<div class="card" id="form-section">
+    <h2>Nouvelle Facture</h2>
+    <input type="text" id="sender" placeholder="Nom de l'entreprise">
+    <input type="text" id="client" placeholder="Nom du client">
+    <input type="text" id="desc" placeholder="Service / Prestation">
+    <input type="number" id="amount" placeholder="Montant TTC (€)">
+    <button onclick="generer()">Générer le PDF</button>
+</div>
 
-    <div id="invoice-preview">
-        <h3 id="p-sender"></h3>
-        <p>Facture n°<span id="p-num"></span> | Date: <span id="p-date"></span></p>
-        <hr>
-        <p><strong>Client:</strong> <span id="p-client"></span></p>
-        <p><strong>Service:</strong> <span id="p-desc"></span></p>
-        <h2 id="p-total"></h2>
-        <button class="btn-pdf" onclick="window.print()">Imprimer / Enregistrer PDF</button>
-        <button style="background: #64748b;" onclick="location.reload()">Nouvelle</button>
-    </div>
+<div id="pdf-content" style="display:none; padding: 20px;">
+    <h1 id="out-sender"></h1>
+    <p>Facture n°<span id="out-num"></span></p>
+    <hr>
+    <p><strong>Client :</strong> <span id="out-client"></span></p>
+    <p><strong>Prestation :</strong> <span id="out-desc"></span></p>
+    <h2>Total : <span id="out-amount"></span> €</h2>
 </div>
 
 <script>
     function generer() {
         const sender = document.getElementById('sender').value;
-        const client = document.getElementById('client').value;
-        const desc = document.getElementById('desc').value;
-        const amount = document.getElementById('amount').value;
+        if(!sender) return alert("Nom de l'entreprise requis");
 
-        if(!sender || !client || !amount) return alert("Remplis tous les champs !");
+        document.getElementById('out-sender').innerText = sender;
+        document.getElementById('out-client').innerText = document.getElementById('client').value;
+        document.getElementById('out-desc').innerText = document.getElementById('desc').value;
+        document.getElementById('out-amount').innerText = document.getElementById('amount').value;
+        document.getElementById('out-num').innerText = Math.floor(Math.random() * 90000);
+        
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('pdf-content').style.display = 'block';
+        
+        // Lance l'impression système pour générer le PDF
+        window.print();
+        
+        // Retour automatique après impression
+        setTimeout(() => location.reload(), 1000);
+    }
+</script>
+</body>
+</html>
 
-        localStorage.setItem('sender', sender);
-        document.getElementById('p-sender').innerText = sender;
-        document.getElementById('p-client').innerText = client;
-        document.getElementById('p-desc').innerText = desc;
