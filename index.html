@@ -1,64 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture Pro</title>
+    <!-- Bibliothèque pour générer le PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        #app-container { font-family: sans-serif; background-color: #0f172a; color: #f8fafc; padding: 20px; max-width: 400px; margin: auto; border-radius: 12px; }
-        input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 6px; border: 1px solid #334155; background-color: #1e293b; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #38bdf8; border: none; border-radius: 6px; margin-top: 10px; cursor: pointer; font-weight: bold; }
-        #invoice-preview { display: none; background: white; color: black; padding: 20px; border-radius: 8px; }
+        :root { --primary: #2563eb; --bg: #f8fafc; }
+        body { font-family: sans-serif; background: var(--bg); padding: 10px; }
+        .card { background: white; padding: 20px; border-radius: 16px; max-width: 500px; margin: auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+        .btn-main { background: var(--primary); }
+        .btn-pdf { background: #059669; }
+        #invoice-preview { display: none; padding: 20px; border: 1px solid #eee; }
     </style>
 </head>
 <body>
-    <div id="app-container">
-        <div id="form-section">
-            <h2>Facture Express</h2>
-            <input type="text" id="sender" placeholder="Votre Nom / Entreprise">
-            <input type="text" id="client" placeholder="Nom du Client">
-            <input type="text" id="product" placeholder="Service / Produit">
-            <input type="number" id="price" placeholder="Montant Total (€)">
-            <button onclick="genererFacture()">Créer la Facture</button>
-        </div>
 
-        <div id="invoice-preview">
-            <h3 id="pdf-sender"></h3>
-            <p>Facture n°<span id="pdf-num"></span> | Date: <span id="pdf-date"></span></p>
-            <hr
-            <p><strong>Client:</strong> <span id="pdf-client"></span></p>
-            <p><strong>Service:</strong> <span id="pdf-product"></span></p>
-            <p><strong>Total:</strong> <span id="pdf-total"></span></p>
-            <button onclick="exporterPDF()">Télécharger en PDF</button>
-            <button onclick="envoyerEmail()" style="background-color: #10b981;">Envoyer par Email</button>
-            <button onclick="location.reload()" style="background-color: #64748b;">Retour</button>
-        </div>
+<div class="card">
+    <div id="form-section">
+        <h2 style="text-align:center;">Nouvelle Facture</h2>
+        <input type="text" id="sender" placeholder="Nom de votre entreprise">
+        <input type="text" id="client" placeholder="Nom du client">
+        <input type="text" id="desc" placeholder="Description du service">
+        <input type="number" id="amount" placeholder="Montant TTC (€)">
+        <button class="btn-main" onclick="generer()">Créer la facture</button>
     </div>
 
-    <script>
-        window.onload = () => { document.getElementById('sender').value = localStorage.getItem('senderName') || ''; };
+    <div id="invoice-preview">
+        <h3 id="p-sender"></h3>
+        <p>Facture n°<span id="p-num"></span> | Date: <span id="p-date"></span></p>
+        <hr>
+        <p><strong>Client:</strong> <span id="p-client"></span></p>
+        <p><strong>Service:</strong> <span id="p-desc"></span></p>
+        <h2 id="p-total"></h2>
+        <button class="btn-pdf" onclick="window.print()">Imprimer / Enregistrer PDF</button>
+        <button style="background: #64748b;" onclick="location.reload()">Nouvelle</button>
+    </div>
+</div>
 
-        function genererFacture() {
-            const sender = document.getElementById('sender').value;
-            const client = document.getElementById('client').value;
-            const product = document.getElementById('product').value;
-            const price = document.getElementById('price').value;
-            if (!sender || !client || !product || !price) return alert('Remplis tout !');
-            localStorage.setItem('senderName', sender);
-            document.getElementById('pdf-sender').innerText = sender;
-            document.getElementById('pdf-client').innerText = client;
-            document.getElementById('pdf-product').innerText = product;
-            document.getElementById('pdf-total').innerText = price + ' €';
-            document.getElementById('pdf-date').innerText = new Date().toLocaleDateString();
-            document.getElementById('pdf-num').innerText = Math.floor(Math.random() * 9000);
-            document.getElementById('form-section').style.display = 'none';
-            document.getElementById('invoice-preview').style.display = 'block';
-        }
+<script>
+    function generer() {
+        const sender = document.getElementById('sender').value;
+        const client = document.getElementById('client').value;
+        const desc = document.getElementById('desc').value;
+        const amount = document.getElementById('amount').value;
 
-        function exporterPDF() { html2pdf().from(document.getElementById('invoice-preview')).save('Facture.pdf'); }
+        if(!sender || !client || !amount) return alert("Remplis tous les champs !");
 
-        function envoyerEmail() {
-            const total = document.getElementById('pdf-total').innerText;
-            window.location.href = "mailto:?subject=Facture&body=Bonjour, voici votre facture de " + total;
-        }
-    </script>
+        localStorage.setItem('sender', sender);
+        document.getElementById('p-sender').innerText = sender;
+        document.getElementById('p-client').innerText = client;
+        document.getElementById('p-desc').innerText = desc;
+        document.getElementById('p-total').innerText = "Total: " + amount + " €";
+        document.getElementById('p-date').innerText = new Date().toLocaleDateString();
+        document.getElementById('p-num').innerText = Math.floor(Math.random() * 9999);
+
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('invoice-preview').style.display = 'block';
+    }
+    
+    // Auto-remplissage au chargement
+    window.onload = () => { document.getElementById('sender').value = localStorage.getItem('sender') || ''; }
+</script>
 </body>
 </html>
